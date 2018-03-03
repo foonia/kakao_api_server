@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import json
+import json, requests
 
 def keyboard(request):
 
@@ -9,14 +9,15 @@ def keyboard(request):
         ret = { "type" : "buttons",
                 "buttons" : ["불 켜기", "불 끄기", "리셋"]
                 }
-        return HttpResponse(json.dumps(ret))
+        return HttpResponse(json.dumps(ret, ensure_ascii=False))
 
 @csrf_exempt
 def message(request):
-    #print(request.body)
+    data = json.loads(request.body.decode('utf-8'))
+
     ret  = {
             'message':{
-                'text':'정상적으로 작동 하였습니다!',
+                'text':'*{}* 정상적으로 작동 하였습니다!'.format(data['content']),
                 },
             'keyboard':{
                 'type':'buttons',
