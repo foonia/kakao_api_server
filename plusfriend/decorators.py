@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 import json
 
 User = get_user_model()
-
 def bot(view_fn):
     @wraps(view_fn)
     @csrf_exempt
@@ -17,13 +16,15 @@ def bot(view_fn):
             request.TEMP = request.JSON
         else:
             request.JSON = {}
+            return JsonResponse(view_fn(request, *args, **kwargs) or {})
 
         user_key = request.JSON.get('user_key')
 
         try:
-            request.user = User.get(username=user_key)
+            request.user = User.objects.get(username=user_key)
         except User.DoesNotExist:
             request.user = User.objects.create(username=user_key)
 
         return JsonResponse(view_fn(request, *args, **kwargs) or {})
     return wrap
+
